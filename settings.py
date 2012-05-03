@@ -4,6 +4,11 @@ import os
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
+COMPRESS_ENABLED=True
+COMPRESS_OFFLINE=True
+COMPRESS_JS_FILTERS=["compressor.filters.yui.YUIJSFilter"]
+COMPRESS_YUI_BINARY="/usr/share/yui-compressor/yui-compressor.jar"
+
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
 )
@@ -78,6 +83,7 @@ STATICFILES_DIRS = (
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'compressor.finders.CompressorFinder',
 #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
@@ -121,6 +127,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'files',
+    'compressor',
 )
 
 # A sample logging configuration. The only tangible logging

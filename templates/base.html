@@ -1,36 +1,42 @@
+{% load compress %}
 <html>
 	<head>
 		<title>{% block title %}Public file management{% endblock %}</title>
 
-    <link href="https://cdn.futurice.com/bootstrap/latest/css/bootstrap.css" rel="stylesheet">
+
+{% compress css %}
+    <link href="/filemanager/static/bootstrap/css/bootstrap.css" rel="stylesheet">
     <style type="text/css">
       body {
         padding-top: 60px;
         padding-bottom: 40px;
       }
     </style>
-    <link href="https://cdn.futurice.com/bootstrap/latest/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="/filemanager/static/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
 
 <!-- Bootstrap Image Gallery styles -->
 <link rel="stylesheet" href="/filemanager/static/css/bootstrap-image-gallery.min.css">
 <!-- CSS to style the file input field as button and adjust the Bootstrap progress bars -->
 <link rel="stylesheet" href="/filemanager/static/css/jquery.fileupload-ui.css">
+{% endcompress %}
 
-    <script type="text/javascript" src="https://cdn.futurice.com/js/jquery-1.7.1.min.js"></script> 
 
-    <script src="https://cdn.futurice.com/bootstrap/latest/js/bootstrap-transition.js"></script>
-    <script src="https://cdn.futurice.com/bootstrap/latest/js/bootstrap-alert.js"></script>
-    <script src="https://cdn.futurice.com/bootstrap/latest/js/bootstrap-modal.js"></script>
-    <script src="https://cdn.futurice.com/bootstrap/latest/js/bootstrap-dropdown.js"></script>
-    <script src="https://cdn.futurice.com/bootstrap/latest/js/bootstrap-scrollspy.js"></script>
-    <script src="https://cdn.futurice.com/bootstrap/latest/js/bootstrap-tab.js"></script>
-    <script src="https://cdn.futurice.com/bootstrap/latest/js/bootstrap-tooltip.js"></script>
-    <script src="https://cdn.futurice.com/bootstrap/latest/js/bootstrap-popover.js"></script>
-    <script src="https://cdn.futurice.com/bootstrap/latest/js/bootstrap-button.js"></script>
-    <script src="https://cdn.futurice.com/bootstrap/latest/js/bootstrap-collapse.js"></script>
-    <script src="https://cdn.futurice.com/bootstrap/latest/js/bootstrap-carousel.js"></script>
-    <script src="https://cdn.futurice.com/bootstrap/latest/js/bootstrap-typeahead.js"></script>
+{% compress js %}
 
+    <script type="text/javascript" src="/filemanager/static/js/jquery-1.7.1.min.js"></script> 
+
+    <script src="/filemanager/static/bootstrap/js/bootstrap-transition.js"></script>
+    <script src="/filemanager/static/bootstrap/js/bootstrap-alert.js"></script>
+    <script src="/filemanager/static/bootstrap/js/bootstrap-modal.js"></script>
+    <script src="/filemanager/static/bootstrap/js/bootstrap-dropdown.js"></script>
+    <script src="/filemanager/static/bootstrap/js/bootstrap-scrollspy.js"></script>
+    <script src="/filemanager/static/bootstrap/js/bootstrap-tab.js"></script>
+    <script src="/filemanager/static/bootstrap/js/bootstrap-tooltip.js"></script>
+    <script src="/filemanager/static/bootstrap/js/bootstrap-popover.js"></script>
+    <script src="/filemanager/static/bootstrap/js/bootstrap-button.js"></script>
+    <script src="/filemanager/static/bootstrap/js/bootstrap-collapse.js"></script>
+    <script src="/filemanager/static/bootstrap/js/bootstrap-carousel.js"></script>
+    <script src="/filemanager/static/bootstrap/js/bootstrap-typeahead.js"></script>
 
 <!-- The jQuery UI widget factory, can be omitted if jQuery UI is already included -->
 <script src="/filemanager/static/js/vendor/jquery.ui.widget.js"></script>
@@ -51,6 +57,8 @@
 <!-- The File Upload user interface plugin -->
 <script src="/filemanager/static/js/jquery.fileupload-ui.js"></script>
 <script src="/filemanager/static/js/locale.js"></script>
+
+{% endcompress %}
 
 		{% block header %}
 		{% endblock %}

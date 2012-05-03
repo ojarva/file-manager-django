@@ -72,6 +72,7 @@ def get_files(user, folder, path):
 
 
     list_of_files = glob.glob("%s/*" % fullpath)
+    list_of_files.sort()
     files_final = []
     for file in list_of_files:
         files_final.append(get_file_raw(file))
