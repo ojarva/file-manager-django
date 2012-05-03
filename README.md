@@ -24,6 +24,7 @@ Setting up
 
 Assumptions in the code (feel free to change, just good to know):
 
+* Bootstrap is served from Futurice CDN server. We don't guarantee it'll be available in the future - but you can always grab another copy of bootstrap from github repository.
 * URL is */filemanager/* (mainly for static files, majority of URLs are generated automatically)
 * */home/u/username/* style home folders
 * *~/public_html* accessible over http
