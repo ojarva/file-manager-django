@@ -1,0 +1,294 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<script type="text/javascript" src="/filemanager/static/js/main.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+$("#folder_permissions").click(function(event) {
+   event.preventDefault();
+   $("#folder_permissions_dialog").modal();
+});
+
+$("#mkdir").click(function(event) {
+   event.preventDefault();
+   $("#mkdir_dialog").modal();
+});
+$("#permission_scheme").change(function() {
+   var value = $("#permission_scheme option:selected").text();
+   $(".permission_options").hide();
+   if (value == "Public") {
+       $("#permission_options_public").show();
+   }
+   if (value == "Futurice SSO") {
+       $("#permission_options_sso").show();
+   }
+   if (value == "Static account") {
+       $("#permission_options_static").show();
+   }
+
+}).change();
+
+
+$("#mkdir_form").bind("keypress", function(e) {
+    if (e.keyCode == 13) {
+        $("#mkdir_save_changes").click();
+        return false;
+    }
+});
+$("#permissions_form").bind("keypress", function(e) {
+    if (e.keyCode == 13) {
+        $("#permissions_save_changes").click();
+        return false;
+    }
+});
+
+
+$("#password").change(function() {
+   var val = $(this).val();
+   console.log($(this));
+   if (val.length < 5) {
+       $("label[for='password']").html("Password (minimum 5 characters)");
+       $("#permissions_save_changes").addClass("disabled");
+   } else {
+       $('label[for="password"]').html("Password (ok)");
+       $("#permissions_save_changes").removeClass("disabled");
+   }
+}).change();
+
+$("#username").change(function() {
+   var val = $(this).val();
+   if (val.length < 3) {
+       $("label[for='username']").html("Username (minimum 3 characters)");
+       $("#permissions_save_changes").addClass("disabled");
+   } else {
+       $('label[for="username"]').html("Username (ok)");
+       $("#permissions_save_changes").removeClass("disabled");
+   }
+}).change();
+
+$("#permissions_save_changes").click(function(event) {
+   event.preventDefault();
+   $.ajax({
+     type: "POST",
+     data: $("#permissions_form").serialize(),
+     url: "{% url permissions_save folder path %}",
+     success: function () {
+        $("#folder_permissions_dialog").modal("hide");
+        $("#notify-messages").append('<div class="alert alert-success"><a class="close" data-dismiss="alert" href="#">×</a><h4 class="alert-heading">Settings saved</h4>Permissions settings saved. Please test your configuration before posting URL to outside world.</div>');
+     },
+   });
+});
+
+$("#mkdir_save_changes").click(function(event) {
+    event.preventDefault();
+    $.ajax({
+     type: "POST",
+     data: $("#mkdir_form").serialize(),
+     url: "{% url mkdir folder path %}",
+     success: function (data) {
+        $("#mkdir_dialog").modal("hide");
+        if (data.success) {
+           $("#notify-messages").append('<div class="alert alert-success"><a class="close" data-dismiss="alert" href="#">×</a><h4 class="alert-heading">Folder created</h4> Folder created successfully.</div>');
+           window.location.href = data.redirect;
+        } else {
+           $("#notify-messages").append('<div class="alert alert-warning"><a class="close" data-dismiss="alert" href="#">×</a><h4 class="alert-heading">An error occured</h4> Folder creation failed. '+data.status+'</div>');
+        }
+     },
+     dataType: 'json',
+    });
+});
+
+
+});
+</script>
+
+
+<div style="display:hidden" class="fade modal" id="folder_permissions_dialog">
+  <div class="modal-header">
+    <button class="close" data-dismiss="modal">×</button>
+    <h3>Change folder permissions</h3>
+  </div>
+  <div class="modal-body">
+    <p>Here you can change access control for this and for subfolders.</p>
+
+    <form name="permissions_form" id="permissions_form" method="post" action="{% url permissions_save folder path %}">
+<select id="permission_scheme" name="permission_scheme">
+<option>Public</option>
+<option>Futurice SSO</option>
+<option>Static account</option>
+</select>
+
+<div class="permission_options" id="permission_options_public">
+Public folder does not require any kind of authentication. Listing files is not allowed, though.
+</div>
+<div class="permission_options" id="permission_options_sso">
+Single sign-on is completely transparent authentication. However, it works only over https. Also, user must have LDAP account.
+</div>
+<div class="permission_options" id="permission_options_static">
+Here you can configure single username and account for this folder. If you need more, please configure permissions manually over ssh.
+
+<label for="username">Username</label>
+<input id="username" type="text" class="span3" name="username" placeholder="Username">
+<label for="password">Password</label>
+<input id="password" type="text" class="span3" name="password" placeholder="Password">
+</div>
+
+</form>
+  </div>
+  <div class="modal-footer">
+    <a href="#" data-dismiss="modal" class="btn">Close</a>
+    <a href="#" id="permissions_save_changes" class="btn btn-primary">Save changes</a>
+  </div>
+</div>
+
+
+
+
+
+<div style="display:hidden" class="fade modal" id="mkdir_dialog">
+  <div class="modal-header">
+    <button class="close" data-dismiss="modal">×</button>
+    <h3>Create new folder</h3>
+  </div>
+  <div class="modal-body">
+    <form name="mkdir_form" id="mkdir_form" method="post" action="{% url mkdir folder path %}">
+<label for="pathname">Pathname</label>
+<input id="pathname" type="text" class="span3" name="pathname" placeholder="Folder name">
+</form>
+  </div>
+
+  <div class="modal-footer">
+    <a href="#" data-dismiss="modal" class="btn">Close</a>
+    <a href="#" id="mkdir_save_changes" class="btn btn-primary">Create folder</a>
+  </div>
+</div>
+
+
+
+<ul class="breadcrumb">
+  <li>
+    <a href="{% url index %}">Home</a> <span class="divider">/</span>
+  </li>
+  <li>
+    <a href="{% url browse folder '' %}">{{ folder }}</a> <span class="divider">/</span>
+  </li>
+  {% for item in path_parts %}
+  <li>
+    <a href="{% url browse folder item.0 %}">{{ item.1 }}</a> <span class="divider">/</span>
+  </li>
+  {% endfor %}
+  <li class="active">{{ current_path }}</li>
+</ul>
+
+   <!-- The file upload form used as target for the file upload widget -->
+    <form id="fileupload" action="{% url upload folder path %}" method="POST" enctype="multipart/form-data">
+        <!-- The fileupload-buttonbar contains buttons to add/delete files and start/cancel the upload -->
+        <div class="row fileupload-buttonbar">
+            <div class="span12">
+                <!-- The fileinput-button span is used to style the file input field as button -->
+                <span class="btn btn-success fileinput-button">
+                    <i class="icon-plus icon-white"></i>
+                    <span>Add files...</span>
+                    <input type="file" name="files[]" multiple>
+                </span>
+                <button type="reset" class="btn btn-warning cancel">
+                    <i class="icon-ban-circle icon-white"></i>
+                    <span>Cancel upload</span>
+                </button>
+                <button type="button" class="btn btn-danger delete">
+                    <i class="icon-trash icon-white"></i>
+                    <span>Delete</span>
+                </button>
+                <button type="button" class="btn btn-info" id="folder_permissions">
+			<i class="icon-globe icon-white"></i>
+			<span>Folder permissions</span>
+		</button>
+                <button type="button" class="btn btn-info" id="mkdir">
+			<i class="icon-ok-circle icon-white"></i>
+			<span>New folder</span>
+		</button>
+                <input type="checkbox" class="toggle">
+            </div>
+            <!-- The global progress information -->
+            <div class="span5 fileupload-progress fade">
+                <!-- The global progress bar -->
+                <div class="progress progress-success progress-striped active">
+                    <div class="bar" style="width:0%;"></div>
+                </div>
+                <!-- The extended global progress information -->
+                <div class="progress-extended">&nbsp;</div>
+            </div>
+        </div>
+        <!-- The loading indicator is shown during file processing -->
+        <div class="fileupload-loading"></div>
+        <br>
+        <!-- The table listing the files available for upload/download -->
+        <table class="table table-striped"><tbody class="files" data-toggle="modal-gallery" data-target="#modal-gallery"></tbody></table>
+    </form>
+
+<!-- The template to display files available for upload -->
+<script id="template-upload" type="text/x-tmpl">
+
+{% templatetag openblock %} for (var i=0, file; file=o.files[i]; i++) { {% templatetag closeblock %}
+    <tr class="template-upload fade">
+        <td class="preview"><span class="fade"></span></td>
+        <td class="name"><span>{% templatetag openblock %}=file.name{% templatetag closeblock %}</span></td>
+        <td class="size"><span>{% templatetag openblock %}=o.formatFileSize(file.size){% templatetag closeblock %}</span></td>
+        <td class="mtime"><span>{% templatetag openblock %}=file.mtime_readable{% templatetag closeblock %}</span></td>
+        {% templatetag openblock %} if (file.error) { {% templatetag closeblock %}
+            <td class="error" colspan="2"><span class="label label-important">{% templatetag openblock %}=locale.fileupload.error{% templatetag closeblock %}</span> {% templatetag openblock %}=locale.fileupload.errors[file.error] || file.error{% templatetag closeblock %}</td>
+        {% templatetag openblock %} } else if (o.files.valid && !i) { {% templatetag closeblock %}
+            <td>
+                <div class="progress progress-success progress-striped active"><div class="bar" style="width:0%%;"></div></div>
+            </td>
+            <td class="start">{% templatetag openblock %} if (!o.options.autoUpload) { {% templatetag closeblock %}
+                <button class="btn btn-primary">
+                    <i class="icon-upload icon-white"></i>
+                    <span>{% templatetag openblock %}=locale.fileupload.start{% templatetag closeblock %}</span>
+                </button>
+            {% templatetag openblock %} } {% templatetag closeblock %}</td>
+        {% templatetag openblock %} } else { {% templatetag closeblock %}
+            <td colspan="2"></td>
+        {% templatetag openblock %} } {% templatetag closeblock %}
+        <td class="cancel">{% templatetag openblock %} if (!i) { {% templatetag closeblock %}
+            <button class="btn btn-warning">
+                <i class="icon-ban-circle icon-white"></i>
+                <span>{% templatetag openblock %}=locale.fileupload.cancel{% templatetag closeblock %}</span>
+            </button>
+        {% templatetag openblock %} } {% templatetag closeblock %}</td>
+    </tr>
+{% templatetag openblock %} } {% templatetag closeblock %}
+</script>
+<!-- The template to display files available for download -->
+<script id="template-download" type="text/x-tmpl">
+{% templatetag openblock %} for (var i=0, file; file=o.files[i]; i++) { {% templatetag closeblock %}
+    <tr class="template-download fade">
+        {% templatetag openblock %} if (file.error) { {% templatetag closeblock %}
+            <td></td>
+            <td class="name"><span>{% templatetag openblock %}=file.name{% templatetag closeblock %}</span></td>
+            <td class="size"><span>{% templatetag openblock %}=o.formatFileSize(file.size){% templatetag closeblock %}</span></td>
+            <td class="mtime"><span>{% templatetag openblock %}=file.mtime_readable{% templatetag closeblock %}</span></td>
+            <td class="error" colspan="2"><span class="label label-important">{% templatetag openblock %}=locale.fileupload.error{% templatetag closeblock %}</span> {% templatetag openblock %}=locale.fileupload.errors[file.error] || file.error{% templatetag closeblock %}</td>
+        {% templatetag openblock %} } else { {% templatetag closeblock %}
+            <td class="preview">{% templatetag openblock %} if (file.thumbnail_url) { {% templatetag closeblock %}
+                <a href="{% templatetag openblock %}=file.url{% templatetag closeblock %}" title="{% templatetag openblock %}=file.name{% templatetag closeblock %}" rel="gallery" download="{% templatetag openblock %}=file.name{% templatetag closeblock %}"><img src="{% templatetag openblock %}=file.thumbnail_url{% templatetag closeblock %}"></a>
+            {% templatetag openblock %} } {% templatetag closeblock %}</td>
+            <td class="name">
+                <a href="{% templatetag openblock %}=file.url{% templatetag closeblock %}" title="{% templatetag openblock %}=file.name{% templatetag closeblock %}" rel="{% templatetag openblock %}=file.thumbnail_url&&'gallery'{% templatetag closeblock %}">{% templatetag openblock %}=file.name{% templatetag closeblock %}</a>
+            </td>
+            <td class="size"><span>{% templatetag openblock %}=o.formatFileSize(file.size){% templatetag closeblock %}</span></td>
+            <td class="mtime"><span>{% templatetag openblock %}=file.mtime_readable{% templatetag closeblock %}</span></td>
+            <td colspan="2"></td>
+        {% templatetag openblock %} } {% templatetag closeblock %}
+        <td class="delete">
+            <button class="btn btn-danger" data-type="{% templatetag openblock %}=file.delete_type{% templatetag closeblock %}" data-url="{% templatetag openblock %}=file.delete_url{% templatetag closeblock %}">
+                <i class="icon-trash icon-white"></i>
+                <span>{% templatetag openblock %}=locale.fileupload.destroy{% templatetag closeblock %}</span>
+            </button>
+            <input type="checkbox" name="delete" value="1">
+        </td>
+    </tr>
+{% templatetag openblock %} } {% templatetag closeblock %}
+</script>
+{% endblock %}

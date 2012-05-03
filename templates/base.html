@@ -1,0 +1,97 @@
+<html>
+	<head>
+		<title>{% block title %}Public file management{% endblock %}</title>
+
+    <link href="https://cdn.futurice.com/bootstrap/latest/css/bootstrap.css" rel="stylesheet">
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+      }
+    </style>
+    <link href="https://cdn.futurice.com/bootstrap/latest/css/bootstrap-responsive.css" rel="stylesheet">
+
+<!-- Bootstrap Image Gallery styles -->
+<link rel="stylesheet" href="/filemanager/static/css/bootstrap-image-gallery.min.css">
+<!-- CSS to style the file input field as button and adjust the Bootstrap progress bars -->
+<link rel="stylesheet" href="/filemanager/static/css/jquery.fileupload-ui.css">
+
+    <script type="text/javascript" src="https://cdn.futurice.com/js/jquery-1.7.1.min.js"></script> 
+
+    <script src="https://cdn.futurice.com/bootstrap/latest/js/bootstrap-transition.js"></script>
+    <script src="https://cdn.futurice.com/bootstrap/latest/js/bootstrap-alert.js"></script>
+    <script src="https://cdn.futurice.com/bootstrap/latest/js/bootstrap-modal.js"></script>
+    <script src="https://cdn.futurice.com/bootstrap/latest/js/bootstrap-dropdown.js"></script>
+    <script src="https://cdn.futurice.com/bootstrap/latest/js/bootstrap-scrollspy.js"></script>
+    <script src="https://cdn.futurice.com/bootstrap/latest/js/bootstrap-tab.js"></script>
+    <script src="https://cdn.futurice.com/bootstrap/latest/js/bootstrap-tooltip.js"></script>
+    <script src="https://cdn.futurice.com/bootstrap/latest/js/bootstrap-popover.js"></script>
+    <script src="https://cdn.futurice.com/bootstrap/latest/js/bootstrap-button.js"></script>
+    <script src="https://cdn.futurice.com/bootstrap/latest/js/bootstrap-collapse.js"></script>
+    <script src="https://cdn.futurice.com/bootstrap/latest/js/bootstrap-carousel.js"></script>
+    <script src="https://cdn.futurice.com/bootstrap/latest/js/bootstrap-typeahead.js"></script>
+
+
+<!-- The jQuery UI widget factory, can be omitted if jQuery UI is already included -->
+<script src="/filemanager/static/js/vendor/jquery.ui.widget.js"></script>
+<!-- The Templates plugin is included to render the upload/download listings -->
+<script src="/filemanager/static/js/tmpl.min.js"></script>
+<script src="/filemanager/static/js/general.js"></script>
+<!-- The Load Image plugin is included for the preview images and image resizing functionality -->
+<script src="/filemanager/static/js/load-image.min.js"></script>
+<!-- The Canvas to Blob plugin is included for image resizing functionality -->
+<script src="/filemanager/static/js/canvas-to-blob.min.js"></script>
+<script src="/filemanager/static/js/bootstrap-image-gallery.min.js"></script>
+<!-- The Iframe Transport is required for browsers without support for XHR file uploads -->
+<script src="/filemanager/static/js/jquery.iframe-transport.js"></script>
+<!-- The basic File Upload plugin -->
+<script src="/filemanager/static/js/jquery.fileupload.js"></script>
+<!-- The File Upload file processing plugin -->
+<script src="/filemanager/static/js/jquery.fileupload-fp.js"></script>
+<!-- The File Upload user interface plugin -->
+<script src="/filemanager/static/js/jquery.fileupload-ui.js"></script>
+<script src="/filemanager/static/js/locale.js"></script>
+
+		{% block header %}
+		{% endblock %}
+	</head>
+	<body>
+
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="{% url index %}">Public file management</a>
+
+          <div class="nav-collapse">
+            <ul class="nav">
+              <li><a href="{% url index %}">Dashboard</a></li>
+		{% block menu %}{%endblock %}
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+
+<div id="notify-messages">
+
+</div>
+
+{% block content %}
+{% endblock %}
+
+      <hr>
+
+      <footer>
+        <p>&copy; Futurice Ltd 2012</p>
+      </footer>
+
+    </div> <!-- /container -->
+	</body>
+</html>

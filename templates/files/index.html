@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Public files management</h1>
+
+<p>With this service, you can manage files on public.futurice.com.</p>
+
+
+<p>
+<a href="{% url browse "public_ssl" ""%}" class="btn btn-primary">Manage files served over https (recommended)</a>
+<a href="{% url browse "public_html" ""%}" class="btn">Manage files served over http</a>
+<a href="{% url browse "upload" ""%}" class="btn">Manage private files</a>
+</p>
+
+
+<p>Technical restrictions:</p>
+
+<ul>
+<li>Symlinks are not supported</li>
+<li>It's possible to mess up file permissions - always check that files really work before sending link to customer</li>
+<li>Changing authentication settings overwrites your custom configurations</li>
+</ul>
+
+{% endblock %}
