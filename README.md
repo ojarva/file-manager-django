@@ -19,8 +19,17 @@ Setting up
 ==========
 
 * Install latest Django (1.4)
-* Configure apache2 & fastcgi (or wsgi)
 * Configure authentication for application URL
+* Start fastcgi server (*bin/restart.sh*)
+* Configure apache2 & fastcgi (or wsgi). We use following configuration:
+
+```
+RewriteEngine on
+RewriteRule ^/filemanager/static/(.*)$ /home/filemanager/static/$1 [QSA,L]
+FastCGIExternalServer /var/www/filemanager.fcgi -socket /home/filemanager/filemanager.sock
+RewriteRule ^/filemanager/(.*)$ /filemanager.fcgi/$1 [QSA,L]
+```
+
 
 Assumptions in the code (feel free to change, just good to know):
 
