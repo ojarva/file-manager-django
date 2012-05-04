@@ -5,10 +5,10 @@
 
 <script type="text/javascript">
 var permissions_post_url = "{% url permissions_save folder path %}";
-var permissions_post_url = "{% url mkdir folder path %}";
+var mkdir_post_url = "{% url mkdir folder path %}";
 var permissions_message = "<div class='alert alert-success'><a class='close' data-dismiss='alert' href='#'>X</a><h4 class='alert-heading'>Settings saved</h4>Permissions settings saved. Please test your configuration before posting URL to outside world.</div>";
-var folders_message_ok = '<div class="alert alert-success"><a class="close" data-dismiss="alert" href="#">×</a><h4 class="alert-heading">Folder created</h4> Folder created successfully.</div>');
-var folders_message_fail = '<div class="alert alert-warning"><a class="close" data-dismiss="alert" href="#">×</a><h4 class="alert-heading">An error occured</h4> Folder creation failed. '+data.status+'</div>');
+var folder_message_ok = '<div class="alert alert-success"><a class="close" data-dismiss="alert" href="#">×</a><h4 class="alert-heading">Folder created</h4> Folder created successfully.</div>';
+var folder_message_fail = '<div class="alert alert-warning"><a class="close" data-dismiss="alert" href="#">×</a><h4 class="alert-heading">An error occured</h4> Folder creation failed. <span id="status_error"></span></div>';
 </script>
 
 {% compress js %}
