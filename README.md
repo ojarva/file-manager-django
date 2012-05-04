@@ -18,7 +18,7 @@ This service is built on [Django](http://djangoproject.com)
 Setting up
 ==========
 
-* Install latest Django (1.4)
+* Install latest Django (1.4), django_compressor and yui-compressor
 * Configure authentication for application URL
 * Start fastcgi server (*bin/restart.sh*)
 * Configure apache2 & fastcgi (or wsgi). We use following configuration:
@@ -33,7 +33,7 @@ RewriteRule ^/filemanager/(.*)$ /filemanager.fcgi/$1 [QSA,L]
 
 Assumptions in the code (feel free to change, just good to know):
 
-* Bootstrap is served from Futurice CDN server. We don't guarantee it'll be available in the future - but you can always grab another copy of bootstrap from github repository.
+* Run *python manage.py collectstatic* and *python manage.py compress* when you change static files.
 * URL is */filemanager/* (mainly for static files, majority of URLs are generated automatically)
 * */home/u/username/* style home folders
 * *~/public_html* accessible over http
