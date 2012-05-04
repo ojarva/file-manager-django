@@ -5,10 +5,34 @@ import subprocess
 from datetime import datetime
 
 
+def construct_fullpath_raw(user, *args):
+    fullpath = "/home/%s/%s" % (user[0], user)
+    for arg in args:
+       if len(arg) > 0:
+           fullpath = "%s/%s" % (fullpath, arg)
+    return fullpath
+
+def construct_fullpath(user, *args):
+    path = construct_fullpath_raw(user, *args)
+    fullpath = os.path.realpath(path)
+    if path != fullpath:
+        return None
+    return fullpath
+
+def valid_file(user, folder, path):
+    fullpath = construct_fullpath(user, folder, path)
+    if not fullpath or not os.path.exists(fullpath):
+        return False
+    return True
+
 def save_permissions(user, folder, path, settings):
-    fullpath = "/home/%s/%s/%s/%s" % (user[0], user, folder, path)
+    fullpath = construct_fullpath(user, folder, path)
+    if not fullpath:
+        return {"success": False, "status": "No symlinks are allowed"}
+
     if not os.path.isdir(fullpath):
         return {"success": False, "status": "Path is not directory"}
+
     mode = settings.get("mode", "public")
     if mode == "public":
         try:
@@ -50,7 +74,9 @@ Require valid-user""" % (fullpath+"/.htpasswd")
 
 
 def get_file(user, folder, path, filename):
-    fullpath = "/home/%s/%s/%s/%s/%s" % (user[0], user, folder, path, filename)
+    fullpath = construct_fullpath(user, folder, path, filename)
+    if not fullpath:
+        return {}
     return get_file_raw(fullpath)
 
 def get_file_raw(file):
@@ -68,8 +94,9 @@ def get_file_raw(file):
 
 
 def get_files(user, folder, path):
-    fullpath = ("/home/%s/%s/%s/%s/" % (user[0], user, folder, path)).replace("//", "/")
-
+    fullpath = construct_fullpath(user, folder, path)
+    if not fullpath:
+        return []
 
     list_of_files = glob.glob("%s/*" % fullpath)
     list_of_files.sort()
@@ -84,7 +111,10 @@ def chown(user, fullpath):
     p.wait()
 
 def mkdir_file(user, folder, path, foldername):
-    fullpath = "/home/%s/%s/%s/%s/%s" % (user[0], user, folder, path, foldername)
+    fullpath = construct_fullpath(user, folder, path, foldername)
+    if not fullpath:
+        return {"success": False, "status": "Invalid path (contains symbolic links)"}
+
     if os.path.exists(fullpath):
         return {"success": False, "status": "File already exists"}
     os.mkdir(fullpath, 0771)
@@ -92,8 +122,8 @@ def mkdir_file(user, folder, path, foldername):
     return {"success": True}
 
 def delete_file(user, folder, path):
-    fullpath = "/home/%s/%s/%s/%s" % (user[0], user, folder, path)
-    if os.path.exists(fullpath):
+    fullpath = construct_fullpath(user, folder, path)
+    if fullpath and os.path.exists(fullpath):
         try:
             if os.path.isdir(fullpath):
                 shutil.rmtree(fullpath)
@@ -105,7 +135,9 @@ def delete_file(user, folder, path):
     return {"success": False, "status": "No such file or directory"}
 
 def upload_file(f, user, folder, path):
-    fullpath = "/home/%s/%s/%s/%s/%s" % (user[0], user, folder, path, f.name)
+    fullpath = construct_fullpath(user, folder, path, f.name)
+    if not fullpath:
+        return False
     destination = open(fullpath, "wb")
     for chunk in f.chunks():
         destination.write(chunk)

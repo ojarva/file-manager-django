@@ -1,13 +1,13 @@
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import get_backends
 from django.contrib.auth.models import User
-from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequest, HttpResponseNotFound
 from django.template import RequestContext, loader
 from django.shortcuts import render_to_response, get_object_or_404
 from django.core.urlresolvers import reverse
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST, condition
 
-from models import get_file, get_files, delete_file, upload_file, mkdir_file, save_permissions
+from models import get_file, get_files, delete_file, upload_file, mkdir_file, save_permissions, valid_file
 
 import os
 import json
@@ -44,6 +44,8 @@ def main(request, template_name):
 
 @ensure_csrf_cookie
 def browse(request, folder, path, template_name):
+    if not valid_file(request.user.username, folder, path):
+        return HttpResponseNotFound("No such file or directory")
     path = path.replace("//", "/")
     path_parts = []
     path_parts_temp = path.split("/")
