@@ -28,7 +28,8 @@ if username == "root":
     print "Invalid username."
     sys.exit(2)
 
-filename_tmp = filename.split("/")
+
+filename_tmp = filename.replace("../", "/").replace("//", "/").split("/")
 if not (len(filename_tmp) > 4 and filename_tmp[1] == "home" and len(filename_tmp[2]) == 1 and len(filename_tmp[3]) > 3):
     print "Invalid path"
     sys.exit(3)
