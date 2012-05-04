@@ -18,6 +18,12 @@ This service is built on [Django](http://djangoproject.com)
 Setting up
 ==========
 
+* Run grep to find references to Futurice (some static files here and there):
+
+```
+grep -R -i futurice *
+```
+
 * Install latest Django (1.4), django_compressor and yui-compressor
 * Configure authentication for application URL
 * Start fastcgi server (*bin/restart.sh*)
