@@ -1,7 +1,7 @@
 import os
 # Django settings for filemanager project.
 
-DEBUG = False
+DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 COMPRESS_ENABLED=True
