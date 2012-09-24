@@ -41,7 +41,9 @@ def permissions_save(request, folder, path):
 @ensure_csrf_cookie
 @require_GET
 def main(request, template_name):
-    ret_dict = {}
+    ret_dict = {"homefolder_exists": True}
+    if not FileOperations.valid_file(request.user.username, "public_html", ""):
+        ret_dict["homefolder_exists"] = False
     return render_to_response(template_name, ret_dict, context_instance=RequestContext(request))
 
 @ensure_csrf_cookie

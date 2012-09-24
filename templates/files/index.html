@@ -4,6 +4,8 @@
 
 <h1>Public files management</h1>
 
+{% if homefolder_exists %}
+
 <p>With this service, you can manage files on public.futurice.com.</p>
 
 
@@ -21,5 +23,15 @@
 <li>It's possible to mess up file permissions - always check that files really work before sending link to customer</li>
 <li>Changing authentication settings overwrites your custom configurations</li>
 </ul>
+
+{% else %}
+
+<p>Your homefolder is missing. Unfortunately, you have to login using ssh/sftp first. Please refresh this page after doing that.</p>
+
+<p><b>Windows</b>: use <a href="http://winscp.net/">WinSCP</a> or <a href="http://www.chiark.greenend.org.uk/~sgtatham/putty/">PuTTY</a>.</p>
+
+<p><b>Linux/Mac</b>: open terminal and run "ssh your_username@public.futurice.com", without quotes, and replace "your_username" with your LDAP account name.</p>
+
+{% endif %}
 
 {% endblock %}
