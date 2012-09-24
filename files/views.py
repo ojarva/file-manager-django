@@ -5,10 +5,10 @@ from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequ
 from django.template import RequestContext, loader
 from django.shortcuts import render_to_response, get_object_or_404
 from django.core.urlresolvers import reverse
-from django.views.decorators.http import require_POST, condition
+from django.views.decorators.http import require_POST, condition, require_GET
 from django.http import Http404
 
-from models import get_file, get_files, delete_file, upload_file, mkdir_file, save_permissions, valid_file
+from utils import FileOperations
 
 import os
 import json
@@ -33,19 +33,21 @@ def permissions_save(request, folder, path):
             return HttpResponseBadRequest("Missing username or password")
         settings["username"] = request.POST.get("username")
         settings["password"] = request.POST.get("password")
-    data = save_permissions(request.user.username, folder, path, settings)
+    data = FileOperations.save_permissions(request.user.username, folder, path, settings)
 
     return JSONResponse(data, {}, response_mimetype(request))
 
 
 @ensure_csrf_cookie
+@require_GET
 def main(request, template_name):
     ret_dict = {}
     return render_to_response(template_name, ret_dict, context_instance=RequestContext(request))
 
 @ensure_csrf_cookie
+@require_GET
 def browse(request, folder, path, template_name):
-    if not valid_file(request.user.username, folder, path):
+    if not FileOperations.valid_file(request.user.username, folder, path):
         raise Http404
     path = path.replace("//", "/")
     path_parts = []
@@ -59,30 +61,40 @@ def browse(request, folder, path, template_name):
     return render_to_response(template_name, ret_dict, context_instance=RequestContext(request))
 
 @ensure_csrf_cookie
-@csrf_exempt
+@requires_csrf_token
 def upload(request, folder, path):
     ret_list = []
     data = []
+ 
+    def get_return_dict(file):
+        return {"name": file.get("filename"), "size": file.get("size"), 'url': url, "mtime": file.get("mtime", 0), "mtime_readable": file.get("mtime_readable", "-"), 'delete_url': reverse("delete", args=[folder, path+"/"+file.get("filename")]), "delete_type": "POST"}
+
     if request.FILES:
         files = request.FILES.get("files[]")
     else:
-        files = get_files(request.user.username, folder, path)
+        files = FileOperations.get_files(request.user.username, folder, path)
         for file in files:
              if os.path.isdir(file.get("full_path")):
                  url = reverse("browse", args=[folder, path+"/"+ file.get("filename")])
              else:
-                 url = "/~%s/%s/%s" % (request.user.username, path, file.get("filename"))
-             data.append({"name": file.get("filename"), "size": file.get("size"), 'url': url, "mtime": file.get("mtime", 0), "mtime_readable": file.get("mtime_readable", "-"), 'delete_url': reverse("delete", args=[folder, path+"/"+file.get("filename")]), "delete_type": "POST"})
+                 if folder == "public_html":
+                     url = "http://public.futurice.com/~%s/%s/%s" % (request.user.username, path, file.get("filename"))
+                 else:
+                     url = "/~%s/%s/%s" % (request.user.username, path, file.get("filename"))
+             data.append(get_return_dict(file))
         return JSONResponse(data, {}, response_mimetype(request))
     f = files
-    upload_file(f, request.user.username, folder, path)
+    FileOperations.upload_file(f, request.user.username, folder, path)
 
-    file = get_file(request.user.username, folder, path, f.name)
+    file = FileOperations.get_file(request.user.username, folder, path, f.name)
     if os.path.isdir(file.get("full_path")):
         url = reverse("browse", args=[folder, path+"/"+ file.get("filename")])
     else:
-        url = "/~%s/%s/%s" % (request.user.username, path, file.get("filename"))
-    data.append({"name": file.get("filename"), "size": file.get("size"), 'url': url, "mtime": file.get("mtime", 0), "mtime_readable": file.get("mtime_readable", "-"), 'delete_url': reverse("delete", args=[folder, path+"/"+file.get("filename")]), "delete_type": "POST"})
+        if folder == "public_html":
+            url = "http://public.futurice.com/~%s/%s/%s" % (request.user.username, path, file.get("filename"))
+        else:
+            url = "/~%s/%s/%s" % (request.user.username, path, file.get("filename"))
+    data.append(get_return_dict(file))
     response = JSONResponse(data, {}, response_mimetype(request))
     response['Content-Disposition'] = 'inline; filename=files.json'
     return response
@@ -91,17 +103,17 @@ def upload(request, folder, path):
 @ensure_csrf_cookie
 @requires_csrf_token
 def delete(request, folder, path):
-    return JSONResponse(delete_file(request.user.username, folder, path), {}, response_mimetype(request))
+    return JSONResponse(FileOperations.delete_file(request.user.username, folder, path), {}, response_mimetype(request))
 
-@ensure_csrf_cookie
 @require_POST
+@ensure_csrf_cookie
 @requires_csrf_token
 def mkdir(request, folder, path):
     pathname = request.POST.get("pathname")
     if not pathname:
         return HttpResponseBadRequest("Missing pathname")
 
-    data = mkdir_file(request.user.username, folder, path, pathname)
+    data = FileOperations.mkdir(request.user.username, folder, path, pathname)
     if data.get("success"):
         data["redirect"] = reverse("browse", args=[folder, path+"/"+pathname])
     return JSONResponse(data, {}, response_mimetype(request))
