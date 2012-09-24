@@ -26,7 +26,7 @@ grep -R -i futurice *
 
 * Install latest Django (1.4), django_compressor and yui-compressor
 * Configure authentication for application URL
-* Start fastcgi server (*bin/restart.sh*)
+* Start fastcgi server (*./bin/restart.sh*)
 * Configure apache2 & fastcgi (or wsgi). We use following configuration:
 
 ```
@@ -56,6 +56,8 @@ Licensing
 
 Code provided by Futurice
 -------------------------
+
+MIT license.
 
 Copyright (C) 2012 Futurice Ltd, Olli Jarva
 
