@@ -1,15 +1,7 @@
 Django file manager
 ===================
 
-We have few servers for sharing files easily. One is called 
-public.futurice.com, which is accessible from everywhere.
-
-Earlier, sftp was the only way to upload files, which is a little bit 
-cumbersome. Server usage is rather versatile: some content is for 
-customers, some for colleagues, and some for everyone.
-
-To make sharing and configuring permissions easier, we made small Django 
-application for managing files and folder access rules.
+This is an old project originally made for Futurice for easily sharing files with clients and between colleagues; from the era before Dropbox, Google Drive etc. were popular and widely accepted tools.
 
 This service is built on [Django](http://djangoproject.com) 
 [jQuery-File-Upload](https://github.com/blueimp/jQuery-File-Upload) and 
@@ -24,7 +16,7 @@ Setting up
 grep -R -i futurice *
 ```
 
-* Install latest Django (1.4), django_compressor and yui-compressor
+* Install dependencies (requirements.txt)
 * Configure authentication for application URL
 * Start fastcgi server (*./bin/restart.sh*)
 * Configure apache2 & fastcgi (or wsgi). We use following configuration:

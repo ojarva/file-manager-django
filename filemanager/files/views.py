@@ -1,19 +1,19 @@
-from django.views.decorators.csrf import csrf_exempt
+import json
+import os
+import subprocess
+
 from django.contrib.auth import get_backends
 from django.contrib.auth.models import User
-from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequest, HttpResponseNotFound
+from django.http import (Http404, HttpResponse, HttpResponseBadRequest,
+                         HttpResponseForbidden, HttpResponseNotFound)
+from django.shortcuts import get_object_or_404, render
 from django.template import RequestContext, loader
-from django.shortcuts import render_to_response, get_object_or_404
-from django.core.urlresolvers import reverse
-from django.views.decorators.http import require_POST, condition, require_GET
-from django.http import Http404
+from django.urls import reverse
+from django.views.decorators.csrf import (csrf_exempt, ensure_csrf_cookie,
+                                          requires_csrf_token)
+from django.views.decorators.http import condition, require_GET, require_POST
 
-from utils import FileOperations
-
-import os
-import json
-import subprocess
-from django.views.decorators.csrf import requires_csrf_token, ensure_csrf_cookie
+from .utils import FileOperations
 
 
 @requires_csrf_token
@@ -44,8 +44,8 @@ def main(request, template_name):
     ret_dict = {"homefolder_exists": True}
     if not FileOperations.valid_file(request.user.username, "public_html", ""):
         ret_dict["homefolder_exists"] = False
-    return render_to_response(template_name, ret_dict, context_instance=RequestContext(request))
-
+    return render(request, template_name, context=ret_dict)
+    
 @ensure_csrf_cookie
 @require_GET
 def browse(request, folder, path, template_name):
@@ -60,14 +60,12 @@ def browse(request, folder, path, template_name):
         path_parts.append((path_construct, item))
 
     ret_dict = {"folder": folder, "path": path, "path_parts": path_parts, "current_path": path_parts_temp[-1] }
-    return render_to_response(template_name, ret_dict, context_instance=RequestContext(request))
+    return render(request, template_name, context=ret_dict)
 
 @ensure_csrf_cookie
 @requires_csrf_token
 def upload(request, folder, path):
-    ret_list = []
     data = []
- 
     def get_return_dict(file):
         return {"name": file.get("filename"), "size": file.get("size"), 'url': url, "mtime": file.get("mtime", 0), "mtime_readable": file.get("mtime_readable", "-"), 'delete_url': reverse("delete", args=[folder, path+"/"+file.get("filename")]), "delete_type": "POST"}
 
@@ -95,7 +93,7 @@ def upload(request, folder, path):
         if folder == "public_html":
             url = "http://public.futurice.com/~%s/%s/%s" % (request.user.username, path, file.get("filename"))
         else:
-            url = "/~%s/%s/%s" % (request.user.username, path, file.get("filename"))
+            url = f"/~{request.user.username}/{path}/{file.get('filename')}"
     data.append(get_return_dict(file))
     response = JSONResponse(data, {}, response_mimetype(request))
     response['Content-Disposition'] = 'inline; filename=files.json'

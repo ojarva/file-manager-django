@@ -10,9 +10,9 @@
 
 
 <p>
-<a href="{% url browse "public_ssl" ""%}" class="btn btn-primary">Manage files served over https (recommended)</a>
-<a href="{% url browse "public_html" ""%}" class="btn">Manage files served over http</a>
-<a href="{% url browse "upload" ""%}" class="btn">Manage private files</a>
+<a href="{% url "browse" "public_ssl" "" %}" class="btn btn-primary">Manage files served over https (recommended)</a>
+<a href="{% url "browse" "public_html" "" %}" class="btn">Manage files served over http</a>
+<a href="{% url "browse" "upload" "" %}" class="btn">Manage private files</a>
 </p>
 
 

@@ -2,9 +2,9 @@
 This file contains methods for managing files and other helper classes, like formatters.
 """
 
-import shutil
-import os
 import glob
+import os
+import shutil
 import subprocess
 from datetime import datetime
 
@@ -18,10 +18,11 @@ class FileOperations:
     @staticmethod
     def construct_fullpath_raw(user, *args):
         """ returns full path without any validation """
-        fullpath = "/home/%s/%s" % (user[0], user)
+#        fullpath = f"/home/{user[0]}/{user}"
+        fullpath = "/Users/ojarva/src/github-cleanup/filetmp/test"
         for arg in args:
             if len(arg) > 0:
-                fullpath = "%s/%s" % (fullpath, arg)
+                fullpath = f"{fullpath}/{arg}"
         return fullpath
 
     @staticmethod
@@ -160,7 +161,7 @@ Require valid-user""" % (fullpath+"/.htpasswd")
 
         if os.path.exists(fullpath):
             return {"success": False, "status": "File already exists"}
-        os.mkdir(fullpath, 0771)
+        os.mkdir(fullpath, 0o771)
         FileOperations.chown(user, fullpath)
         return {"success": True}
 
@@ -174,7 +175,7 @@ Require valid-user""" % (fullpath+"/.htpasswd")
                 else:
                     os.remove(fullpath)
                 return {"success": True}
-            except Exception, e:
+            except Exception as e:
                 return {"success": False, "status": "rm failed: %s" % fullpath, "err": str(e)}
         return {"success": False, "status": "No such file or directory"}
 
